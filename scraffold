@@ -1,0 +1,70 @@
+#!/bin/bash
+
+script_name=${0##*/}
+usage() {
+    echo "Usage: $script_name [COMMAND] [OPTIONS]
+
+COMMAND:
+
+
+OPTIONS:
+  -h, --help            显示帮助
+
+"
+}
+
+abort() {
+    tput sgr0
+    tput setaf 1
+    {
+        if [ "$#" -eq 0 ]; then
+            cat -
+        else
+            echo "$TSA_SCRIPT_NAME: $*"
+        fi
+    } >&2
+    tput sgr0
+    exit 1
+}
+
+typer() {
+    cat >walk.py <<EOF
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import os
+
+import typer
+
+app = typer.Typer()
+
+
+@app.command()
+def walk(path: str):
+    for root, dirs, filenames in os.walk(path):
+        for fn in filenames:
+            ...
+
+
+if __name__ == "__main__":
+    app()
+
+EOF
+}
+
+while [ -n "$1" ]; do
+    case $1 in
+    -h | --help)
+        usage
+        exit
+        ;;
+    typer)
+        typer
+        ;;
+
+    *)
+        abort "option '$1' not recognized, please run '$script_name --help' for more information"
+        ;;
+    esac
+    shift
+done
